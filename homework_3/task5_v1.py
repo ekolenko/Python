@@ -3,6 +3,8 @@
 # Задайте число. Составьте список чисел Фибоначчи, 
 # в том числе для отрицательных индексов.
 
+import my_func
+
 
 def fib(n: int) -> int:
     if n == 0:
@@ -33,7 +35,9 @@ def get_fib_list(in_dict: dict) -> list:
 
 
 
-n = int(input('--> '))
+n = my_func.input_int()
+
+n = abs(n)
 
 fib_dict = get_fib_dict(n)
 

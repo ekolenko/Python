@@ -5,6 +5,8 @@
 
 ## без рекурсии, добавление отрицательных по другой формуле
 
+import my_func
+
 
 def get_fib_dict(n):
 
@@ -32,7 +34,9 @@ def get_fib_list(in_dict: dict) -> list:
     return fib_list
 
 
-n = int(input('--> '))
+n = my_func.input_int()
+
+n = abs(n)
 
 fib_dict = get_fib_dict(n)
 
