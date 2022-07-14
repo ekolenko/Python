@@ -10,7 +10,7 @@ def fib(n: int) -> int:
     elif n == 2 or n == 1:
         return 1
     else:
-        return fib(n-1)+fib(n-2)
+        return fib(n - 1) + fib(n - 2)
 
 
 def get_fib_dict(n: int) -> dict:
