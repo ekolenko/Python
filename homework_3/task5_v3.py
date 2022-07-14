@@ -16,7 +16,6 @@ def get_fib_dict(n):
         match i:
             case 0: tmp_dict[i] = 0
             case 1: tmp_dict[i] = 1
-            case 2: tmp_dict[i] = 1
             case _: tmp_dict[i] = tmp_dict[i - 2] + tmp_dict[i - 1]
     
     return tmp_dict
