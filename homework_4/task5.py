@@ -119,4 +119,7 @@ file_name_1 = 'task5_1.txt'
 file_name_2 = 'task5_2.txt'
 file_name_3 = 'task5_3.txt'
 
-write_to_file(file_name_3, get_sum_mchlen_str_from_files(file_name_1, file_name_2))
+try:
+    write_to_file(file_name_3, get_sum_mchlen_str_from_files(file_name_1, file_name_2))
+except:
+    print('something wrong. check files')
