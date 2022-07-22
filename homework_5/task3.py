@@ -13,9 +13,26 @@ g_index = None
 g_mod = None
 roud_count = None
 win_combination = None
+lambda_list = []
+
+
+def lambda_init():
+    global lambda_list
+    
+    lambda_list.append(lambda x: x[0][0] == 1)
+    lambda_list.append(lambda x: x[0][1] == 1)
+    lambda_list.append(lambda x: x[0][0] == 2)
+    lambda_list.append(lambda x: x[0][1] == 2)  
+    lambda_list.append(lambda x: x[0][0] == 3)
+    lambda_list.append(lambda x: x[0][1] == 3)          
+    lambda_list.append(lambda x: x[0][0] == x[0][1])            
+    lambda_list.append(lambda x: abs(x[0][0] - x [0][1]) == 2 or x[0][0] == x[0][1] == 2)
+
 
 def game_init():
+
     os.system('clear')
+
     global board
     global g_index
     global g_mod
@@ -49,11 +66,15 @@ def game_init():
         return False
     
     g_index = randint(1,2)
+
+    lambda_init()
+
     print(f'\nИгрок {g_index % 2 + 1} начинает первым.\n')
    
     for i in range(3,0,-1):
         print(f'Игра начнётся через: {i}')
         sleep(1)
+    
     return True
 
 
@@ -69,7 +90,7 @@ def game_win_score():
     os.system('clear')
     print('----------- ')
     for i in range(1,4):        
-        print(' ' + ' | '.join([ ('\033[33m'+board[i,y]+'\033[0m' if (i,y) in win_combination else board[i,y]) for y in range(1,4)]))
+        print(' ' + ' | '.join([ ('\033[32m'+board[i,y]+'\033[0m' if (i,y) in win_combination else board[i,y]) for y in range(1,4)]))
         print('----------- ')
 
 
@@ -89,53 +110,26 @@ def check_coordinates(coord: str):
 
     if board[int(coord[0]),int(coord[1])] == ' ':
         return coord
+
     else:
         print('Ячейка поля занята!')
         return False
 
 
 def find_coord():
-    board_lst = get_board_lst()
-    find_ind = 8
-    for i in range(len(board_lst)):
-        if re.match(r'^[o][ ][o]$|^[o][o][ ]$|^[ ][o][o]$',board_lst[i]) != None:
-            find_ind = i
-            find_pos = board_lst[i].index(' ')
-            return return_coord(find_ind, find_pos)
-    
-    for i in range(len(board_lst)):
-        if re.match(r'^[x][ ][x]$|^[x][x][ ]$|^[ ][x][x]$',board_lst[i]) != None:
-            find_ind = i
-            find_pos = board_lst[i].index(' ')
-            return return_coord(find_ind, find_pos)
-    
-    return return_coord(8,None)
-    
+    for str_xo in ('o','x'):
+        for f in lambda_list:
+            coord_line = check_bot_combination(f,str_xo)
 
-def return_coord(find_ind: int,find_pos: int) -> tuple:
+            if type(coord_line) == tuple:                
+                for coord in coord_line:
+                    if board[coord] == ' ':
+                        return coord  
 
-    match find_ind:
-        case 0:
-            return (1, find_pos + 1)
-        case 1:
-            return (find_pos + 1, 1)
-        case 2:
-            return (2, find_pos + 1)
-        case 3:
-            return (find_pos + 1, 2)
-        case 4:
-            return (3, find_pos + 1)
-        case 5:
-            return (find_pos + 1, 3)
-        case 6:
-            return (find_pos + 1, find_pos + 1) 
-        case 7:
-            return (3 - find_pos , find_pos + 1)   
-        case 8:
-            list_coord = [ key for key in board.keys() if board[key] == ' ']
-            coord = list_coord[randint(0,len(list_coord) - 1)]
-            return  coord
-            
+    list_coord = [ key for key in board.keys() if board[key] == ' ']
+    coord = list_coord[randint(0,len(list_coord) - 1)]
+    return  coord
+
 
 def game_round():
     global board
@@ -158,10 +152,10 @@ def game_bot_round():
         if board[(2,2)] == ' ':
             coord = (2,2)
         else:
-            coord = find_coord()
+            coord = find_coord()            
     sleep(1)
     print(str(coord[0]) + str(coord[1]), end=' ', flush=True)
-    sleep(2)
+    sleep(1)
     board[coord] = 'o'
 
 
@@ -195,7 +189,7 @@ def game():
     game_over(False)
 
 
-def check_combination(f):
+def check_win_combination(f) -> bool:
     global win_combination
     check_dict = dict(filter(f,board.items()))
     if tuple(check_dict.values()).count('x' if g_index == 1 else 'o') == 3:
@@ -204,16 +198,17 @@ def check_combination(f):
     return False
 
 
+def check_bot_combination(f,str_xo):
+    check_dict = dict(filter(f,board.items()))
+    if tuple(check_dict.values()).count(str_xo) == 2 and tuple(check_dict.values()).count(' ') == 1:
+        return tuple(check_dict.keys())
+    return False
+
+
 def win_condition() -> bool:
-    for i in range(1,4):
-        if check_combination(lambda x: x[0][0] == i):
-            return True
-        if check_combination(lambda x: x[0][1] == i):
-            return True
-    if check_combination(lambda x: x[0][0] == x[0][1]):
-            return True
-    if check_combination(lambda x: abs(x[0][0] - x [0][1]) == 2 or x[0][0] == x[0][1] == 2):
-            return True
+    for f in lambda_list:
+            if check_win_combination(f):
+                return True
     return False
     
 
