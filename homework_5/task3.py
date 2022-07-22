@@ -12,6 +12,7 @@ board = {}
 g_index = None
 g_mod = None
 roud_count = None
+win_combination = None
 
 def game_init():
     os.system('clear')
@@ -60,7 +61,15 @@ def game_score():
     os.system('clear')
     print('----------- ')
     for i in range(1,4):        
-        print(' ' + ' | '.join([ board[i,y] for y in range(1,4)]))
+        print(' ' + ' | '.join([board[i,y] for y in range(1,4)]))
+        print('----------- ')
+
+
+def game_win_score():
+    os.system('clear')
+    print('----------- ')
+    for i in range(1,4):        
+        print(' ' + ' | '.join([ ('\033[33m'+board[i,y]+'\033[0m' if (i,y) in win_combination else board[i,y]) for y in range(1,4)]))
         print('----------- ')
 
 
@@ -157,11 +166,12 @@ def game_bot_round():
 
 
 def game_over(is_draw):
-    os.system('clear')
-    game_score()
+    os.system('clear') 
     if is_draw:
+        game_score() 
         print(f'\nНичья! Победила дружба!\n')
     else:
+        game_win_score()
         print(f'\nПобедил Игрок {g_index}! Поздравляем!\n')
 
 
@@ -185,28 +195,27 @@ def game():
     game_over(False)
 
 
-def get_board_lst() -> list:
-    check_str_lst = []
-    for i in range(1,4):
-        check_str_lst.append(''.join([ board[i,y] for y in range(1,4)]))
-        check_str_lst.append(''.join([ board[y,i] for y in range(1,4)]))
-
-    check_str_lst.append(''.join([ board[y,y] for y in range(1,4)]))
-    check_str_lst.append(''.join([ board[4-y,y] for y in range(1,4)]))
-    return check_str_lst
+def check_combination(f):
+    global win_combination
+    check_dict = dict(filter(f,board.items()))
+    if tuple(check_dict.values()).count('x' if g_index == 1 else 'o') == 3:
+        win_combination = tuple(check_dict.keys())
+        return True
+    return False
 
 
 def win_condition() -> bool:
-    check_str_lst= get_board_lst()    
-    return check_lst(check_str_lst)
-    
-
-def check_lst(check_str_lst: list) -> bool:
-    for elem in check_str_lst:
-        if re.match(r'^[x]{3}$|^[o]{3}$',elem) != None:
+    for i in range(1,4):
+        if check_combination(lambda x: x[0][0] == i):
+            return True
+        if check_combination(lambda x: x[0][1] == i):
+            return True
+    if check_combination(lambda x: x[0][0] == x[0][1]):
+            return True
+    if check_combination(lambda x: abs(x[0][0] - x [0][1]) == 2 or x[0][0] == x[0][1] == 2):
             return True
     return False
-
+    
 
 if game_init():
     game()
