@@ -36,7 +36,7 @@ def init():
                 return False
 
     if g_mod == None:
-        g_mod = 2
+        g_mod = 1
         print('Выбран режим по умолчанию: CLI')
 
     if d_mod == None:
