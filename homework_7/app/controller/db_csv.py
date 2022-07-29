@@ -12,3 +12,6 @@ def get_data_from_file(file_name=None):
     except:
         return []
 
+def get_data(str_pattern):
+    print('CSV mode not supported yet')
+    return []
